@@ -67,8 +67,7 @@ Khi cá ngựa của người chơi đứng tại vị trí dưới chuồng có
 
 ## Bước 1
 - Bốn người chơi chọn quân cờ theo màu mình thích.
-- Sử dụng 1 xúc xắc, mỗi người tung 1 lần.
-- Người có số điểm cao nhất sẽ đi trước.
+- Random người chơi đi đầu.
 - Thứ tự chơi tiếp theo được tính theo chiều ngược kim đồng hồ.
 
 ## Bước 2
