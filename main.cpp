@@ -65,58 +65,33 @@ public:
         return count;
     }
 
-
-    int chonQuan(int diem, const int banCo[], int myTurn) {
-        // 1. Ưu tiên xuất chuồng nếu đổ được 6
+    int chonQuan(int diem, const int banCo[]) {
         if (diem == 6) {
             for (int i = 0; i < NUM_PIECES; i++) {
                 if (quan[i].viTri == -1) {
-                    int startPos = (myTurn * 12) % BOARD_SIZE;
-
-                    if (banCo[startPos] != myTurn) {
-                        return i;
-                    }
+                    return i;
                 }
             }
         }
-
 
         vector<int> coTheDi;
         for (int i = 0; i < NUM_PIECES; i++) {
             if (quan[i].viTri >= 0 && quan[i].viTri < BOARD_SIZE && !quan[i].veDich) {
-                int nextViTri = quan[i].viTri + diem;
-
-                //
-                if (nextViTri > BOARD_SIZE) {
-                    nextViTri = 2 * BOARD_SIZE - nextViTri;
-                }
-
-                if (nextViTri < BOARD_SIZE) {
-                    int absPos = (myTurn * 12 + nextViTri) % BOARD_SIZE;
-                    if (banCo[absPos] != myTurn) {
-                        coTheDi.push_back(i);
-                    }
-                }
-                else if (nextViTri == BOARD_SIZE) {
-                    coTheDi.push_back(i);
-                }
+                coTheDi.push_back(i);
             }
         }
 
-        if (coTheDi.empty()) return -1;
+        if (coTheDi.empty()) {
+            return -1;
+        }
 
         int chosen = coTheDi[0];
 
         if (chienThuat == 0) {
             for (int i : coTheDi) {
-                int nextViTri = quan[i].viTri + diem;
-                if (nextViTri > BOARD_SIZE) nextViTri = 2 * BOARD_SIZE - nextViTri;
-
-                if (nextViTri < BOARD_SIZE) {
-int target = (myTurn * 12 + nextViTri) % BOARD_SIZE;
-                    if (banCo[target] != -1 && banCo[target] != myTurn) {
-                        return i;
-                    }
+                int target = quan[i].viTri + diem;
+                if (target < BOARD_SIZE && banCo[target] != -1 && banCo[target] != chienThuat) {
+                    return i;
                 }
             }
         }
@@ -128,23 +103,26 @@ int target = (myTurn * 12 + nextViTri) % BOARD_SIZE;
             }
         }
         else if (chienThuat == 2) {
+            int minPieces = 5;
             for (int i : coTheDi) {
-                if (quan[i].viTri < quan[chosen].viTri) {
+                int count = 0;
+                for (int j = 0; j < NUM_PIECES; j++) {
+                    if (quan[j].viTri >= 0 && quan[j].viTri < BOARD_SIZE) {
+                        count++;
+                    }
+                }
+                if (count < minPieces) {
+                    minPieces = count;
                     chosen = i;
                 }
             }
-        }
+}
         else if (chienThuat == 3) {
             for (int i : coTheDi) {
-                int nextViTri = quan[i].viTri + diem;
-                if (nextViTri > BOARD_SIZE) nextViTri = 2 * BOARD_SIZE - nextViTri;
-
-                if (nextViTri < BOARD_SIZE) {
-                    int newPos = (myTurn * 12 + nextViTri) % BOARD_SIZE;
-                    if (banCo[newPos] == -1) {
-                        chosen = i;
-                        break;
-                    }
+                int newPos = quan[i].viTri + diem;
+                if (newPos < BOARD_SIZE && banCo[newPos] == -1) {
+                    chosen = i;
+                    break;
                 }
             }
         }
@@ -157,7 +135,7 @@ void runGame(vector<NguoiChoi>& players) {
     int banCo[BOARD_SIZE];
     fill(banCo, banCo + BOARD_SIZE, -1);
 
-    for (auto& p : players) {
+    for (auto &p : players) {
         p.reset();
         p.tongLuotChoi++;
     }
@@ -167,57 +145,45 @@ void runGame(vector<NguoiChoi>& players) {
     bool done = false;
 
     while (!done && totalTurns < MAX_TURNS) {
-        NguoiChoi& p = players[turn];
+        NguoiChoi &p = players[turn];
         int diem = (rand() % 6) + 1;
-
-        int id = p.chonQuan(diem, banCo, turn);
+        int id = p.chonQuan(diem, banCo);
 
         if (id != -1) {
-
             if (p.quan[id].viTri >= 0 && p.quan[id].viTri < BOARD_SIZE) {
-                int oldAbs = (turn * 12 + p.quan[id].viTri) % BOARD_SIZE;
-                banCo[oldAbs] = -1;
+                banCo[p.quan[id].viTri] = -1;
             }
 
+            int newPos = p.quan[id].viTri + diem;
 
-            int nextViTri;
-            if (p.quan[id].viTri == -1) {
-                nextViTri = 0;
-            }
-            else {
-                nextViTri = p.quan[id].viTri + diem;
-                if (nextViTri > BOARD_SIZE) {
-                    nextViTri = 2 * BOARD_SIZE - nextViTri;
+            if (newPos >= BOARD_SIZE) {
+                newPos = 2 * BOARD_SIZE - newPos;
+                if (newPos >= BOARD_SIZE) {
+                    p.quan[id].veDich = true;
+                    p.quan[id].viTri = BOARD_SIZE;
+                } else {
+                    p.quan[id].viTri = newPos;
+                    banCo[newPos] = turn;
                 }
-            }
+            } else {
+                p.quan[id].viTri = newPos;
 
-
-            if (nextViTri == BOARD_SIZE) {
-                p.quan[id].veDich = true;
-                p.quan[id].viTri = BOARD_SIZE;
-            }
-            else {
-                p.quan[id].viTri = nextViTri;
-                int newAbs = (turn * 12 + nextViTri) % BOARD_SIZE;
-
-                // Logic đá quân chuẩn xác
-                if (banCo[newAbs] != -1 && banCo[newAbs] != turn) {
-                    int p_bi_da = banCo[newAbs];
-                    for (int j = 0; j < NUM_PIECES; j++) {
-                        if (players[p_bi_da].quan[j].viTri >= 0 && players[p_bi_da].quan[j].viTri < BOARD_SIZE) {
-                            int enemyAbs = (p_bi_da * 12 + players[p_bi_da].quan[j].viTri) % BOARD_SIZE;
-                            if (enemyAbs == newAbs) {
-players[p_bi_da].quan[j].viTri = -1;
-                                break;
+                bool coQuanBiDa = false;
+                for (int p_id = 0; p_id < 4; p_id++) {
+                    if (p_id != turn) {
+                        for (int j = 0; j < NUM_PIECES; j++) {
+                            if (players[p_id].quan[j].viTri == newPos) {
+                                players[p_id].quan[j].viTri = -1;
+                                coQuanBiDa = true;
                             }
                         }
                     }
                 }
-                banCo[newAbs] = turn;
+                banCo[newPos] = turn;
             }
 
-
-            if (p.soQuanVeDich() == NUM_PIECES) {
+            int winCount = p.soQuanVeDich();
+            if (winCount == NUM_PIECES) {
                 p.soLanThang++;
                 done = true;
             }
@@ -235,7 +201,10 @@ int main() {
     srand(time(0));
     int n;
 
+    cout << "\n";
+    cout << "========================================" << endl;
     cout << "       TRO CHOI CO CA NGUA - SIMULATOR" << endl;
+    cout << "========================================" << endl;
     cout << "\nNhap so van muon mo phong: ";
 
     if (!(cin >> n) || n <= 0) {
@@ -249,18 +218,26 @@ int main() {
         NguoiChoi("CHIEN THUAT DAN QUAN", 2),
         NguoiChoi("CHIEN THUAT AN TOAN", 3)
     };
+cout << "\nDang chay mo phong " << n << " van..." << endl;
+    cout << "Vui long cho..." << endl << endl;
 
     for (int i = 0; i < n; i++) {
         runGame(players);
+
+        if ((i + 1) % 100 == 0) {
+            cout << "Da hoan thanh: " << (i + 1) << "/" << n << " van" << endl;
+        }
     }
 
-    cout << "\n========================================" << endl;
+    cout << "\n";
+    cout << "========================================" << endl;
     cout << "   KET QUA SAU " << n << " VAN MO PHONG" << endl;
+    cout << "========================================" << endl << endl;
 
     vector<pair<double, int>> results;
     for (int i = 0; i < 4; i++) {
         double winRate = (double)players[i].soLanThang / n * 100;
-        results.push_back({ winRate, i });
+        results.push_back({winRate, i});
     }
 
     sort(results.rbegin(), results.rend());
@@ -268,25 +245,27 @@ int main() {
     int rank = 1;
     for (auto [winRate, idx] : results) {
         cout << rank << ". " << left << setw(25) << players[idx].ten
-            << right << setw(5) << players[idx].soLanThang << " thang | "
-            << fixed << setprecision(2) << setw(6) << winRate << "%" << endl;
+             << right << setw(5) << players[idx].soLanThang << " thang | "
+             << fixed << setprecision(2) << setw(6) << winRate << "%" << endl;
         rank++;
     }
 
+    cout << "\n";
+    cout << "Chi tiet tung chien thuat:" << endl;
     cout << "----------------------------------------" << endl;
-    cout << "\nChi tiet tung chien thuat:" << endl;
-
 
     for (int i = 0; i < 4; i++) {
         cout << "\n" << players[i].ten << endl;
         cout << "  Tong luot choi: " << players[i].tongLuotChoi << endl;
         cout << "  Tong thang:     " << players[i].soLanThang << endl;
-        double rate = players[i].tongLuotChoi > 0 ? (double)players[i].soLanThang / players[i].tongLuotChoi * 100 : 0;
-        cout << "  Ty le thang (Win/Luot): " << fixed << setprecision(2) << rate << "%" << endl;
+        cout << "  Tong thua:      " << (players[i].tongLuotChoi - players[i].soLanThang) << endl;
+        double rate = (double)players[i].soLanThang / players[i].tongLuotChoi * 100;
+        cout << "  Ty le thang:    " << fixed << setprecision(2) << rate << "%" << endl;
     }
 
     cout << "\n========================================" << endl;
     cout << "       KET THUC MO PHONG" << endl;
+    cout << "========================================" << endl << endl;
 
     return 0;
 }
