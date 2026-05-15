@@ -196,7 +196,6 @@ void runGame(vector<NguoiChoi>& players) {
         totalTurns++;
     }
 }
-
 int main() {
     srand(time(0));
     int n;
@@ -249,7 +248,6 @@ cout << "\nDang chay mo phong " << n << " van..." << endl;
              << fixed << setprecision(2) << setw(6) << winRate << "%" << endl;
         rank++;
     }
-
     cout << "\n";
     cout << "Chi tiet tung chien thuat:" << endl;
     cout << "----------------------------------------" << endl;
