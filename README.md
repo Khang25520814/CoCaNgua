@@ -32,7 +32,7 @@ Nếu trong lượt tung xúc xắc người chơi ra số **6** thì được q
 Cá ngựa của người chơi có thể đá cá ngựa của đối phương nếu khoảng cách di chuyển đúng bằng số điểm trên xúc xắc.
 
 ## Quy luật 4
-Khi người chơi đã có quân cờ ra khỏi vị trí xuất phát và tung được **1** hoặc **6**, người chơi có 2 lựa chọn:
+Khi người chơi đã có quân cờ ra khỏi vị trí xuất phát và tung được **6**, người chơi có 2 lựa chọn:
 
 ### Hướng 1
 Di chuyển quân cờ hiện tại theo số bước tương ứng với kết quả xúc xắc.
