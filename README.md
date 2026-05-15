@@ -23,10 +23,10 @@
 # II. Quy luật chơi
 
 ## Quy luật 1
-Người chơi chỉ được xuất quân khi tung xúc xắc ra số **1** hoặc **6**.
+Người chơi chỉ được xuất quân khi tung xúc xắc ra số **6**.
 
 ## Quy luật 2
-Nếu trong lượt tung xúc xắc người chơi ra số **1** hoặc **6** thì được quyền tung tiếp.
+Nếu trong lượt tung xúc xắc người chơi ra số **6** thì được quyền tung tiếp.
 
 ## Quy luật 3
 Cá ngựa của người chơi có thể đá cá ngựa của đối phương nếu khoảng cách di chuyển đúng bằng số điểm trên xúc xắc.
